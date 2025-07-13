@@ -1,54 +1,40 @@
 import streamlit as st
-import random
-import string
+import requests
 
-# Exemple réduit — remplace par ta vraie liste de 500 animés
-anime_list = [
-    "Attack on Titan",
-    "Bleach",
-    "Code Geass",
-    "Death Note",
-    "Evangelion",
-    "Fullmetal Alchemist",
-    "Gintama",
-    "Haikyuu",
-    "Inuyasha",
-    "Jujutsu Kaisen",
-    "K-On!",
-    "Love Live!",
-    "Mob Psycho 100",
-    "Naruto",
-    "One Piece",
-    "Pokemon",
-    "Queen’s Blade",
-    "Re:Zero",
-    "Sword Art Online",
-    "Tokyo Ghoul",
-    "Your Lie in April",
-]
+st.set_page_config(page_title="Carte Anime avec Groq", page_icon="🎴")
+st.title("🎴 Générateur de carte d'identité Anime avec Groq")
 
-st.title("🎯 Devine l'anime !")
+API_KEY = st.secrets.get("ARD_KEY_API")
 
-# Tirer un anime au hasard et garder en session
-if "anime_courant" not in st.session_state:
-    st.session_state.anime_courant = random.choice(anime_list)
+name = st.text_input("Nom du personnage :")
+anime = st.text_input("Nom de l'anime :")
+genre = st.selectbox("Genre :", ["Shonen", "Shojo", "Seinen", "Isekai", "Comédie", "Horreur", "Romance", "Autre"])
+traits = st.multiselect("Traits de personnalité :", ["Courageux", "Intelligent", "Drôle", "Sérieux", "Mystérieux", "Gentil", "Impulsif", "Loyal"])
 
-anime_courant = st.session_state.anime_courant
-lettre_indice = anime_courant[0].upper()
-
-st.write(f"L'anime commence par la lettre : **{lettre_indice}**")
-
-# Saisie utilisateur
-reponse = st.text_input("Devine le nom complet de l'anime:")
-
-if st.button("Valider"):
-    if reponse.strip().lower() == anime_courant.lower():
-        st.success("Bravo, c'est la bonne réponse ! 🎉")
-        # Recommencer avec un autre anime
-        st.session_state.anime_courant = random.choice(anime_list)
+if st.button("Générer la carte"):
+    if not API_KEY:
+        st.error("Clé API Groq introuvable dans les secrets.")
+    elif not (name and anime and traits):
+        st.warning("Merci de remplir tous les champs.")
     else:
-        st.error("Non, essaie encore !")
-
-if st.button("Changer d'anime"):
-    st.session_state.anime_courant = random.choice(anime_list)
-    st.experimental_rerun()
+        prompt = (
+            f"Génère une carte d'identité stylée pour un personnage d'anime nommé {name}, "
+            f"de l'anime {anime}, genre {genre}. "
+            f"Ses traits de personnalité : {', '.join(traits)}. "
+            "Donne-moi nom, anime, stats, biographie courte, catchphrase."
+        )
+        headers = {
+            "Authorization": f"Bearer {API_KEY}",
+            "Content-Type": "application/json"
+        }
+        payload = {
+            "model": "mixtral-8x7b-32768",
+            "messages": [{"role": "user", "content": prompt}]
+        }
+        response = requests.post("https://api.groq.com/openai/v1/chat/completions", headers=headers, json=payload)
+        if response.status_code == 200:
+            content = response.json()["choices"][0]["message"]["content"]
+            st.markdown("## 💳 Carte d'identité :")
+            st.markdown(content)
+        else:
+            st.error(f"Erreur API : {response.status_code} - {response.text}")
