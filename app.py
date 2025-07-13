@@ -14,14 +14,16 @@ if not API_KEY:
 name = st.text_input("Entrez le nom de votre personnage :")
 anime = st.text_input("Nom de l'anime :")
 genre = st.selectbox("Genre :", ["Shonen", "Shojo", "Seinen", "Isekai", "Comédie", "Horreur", "Romance", "Autre"])
-personnalite = st.text_area("Décris sa personnalité :", max_chars=150)
+personnalite = st.selectbox("Choisis la personnalité :", [
+    "Courageux", "Timide", "Rusé", "Drôle", "Sérieux", "Mystérieux", "Gentil", "Ambitieux"
+])
 
 if st.button("🎨 Générer la carte"):
     if name and anime and personnalite:
         with st.spinner("Génération de la fiche..."):
             prompt = (
                 f"Génère une carte d'identité d'un personnage d'anime nommé {name} venant de l'anime {anime}. "
-                f"Il est de genre {genre}. Voici sa personnalité : {personnalite}. "
+                f"Il est de genre {genre}. Sa personnalité est : {personnalite}. "
                 "Donne-moi une fiche stylée avec son nom, son anime, ses stats, une courte biographie et une catchphrase stylée."
             )
             headers = {
