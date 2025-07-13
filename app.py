@@ -28,7 +28,7 @@ if st.button("Générer la carte"):
             "Content-Type": "application/json"
         }
         payload = {
-            "model": "mixtral-8x7b-32768",
+            "model": "deepseek-r1-distill-llama-70b",
             "messages": [{"role": "user", "content": prompt}]
         }
         response = requests.post("https://api.groq.com/openai/v1/chat/completions", headers=headers, json=payload)
