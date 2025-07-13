@@ -1,39 +1,54 @@
 import streamlit as st
-import requests
+import random
+import string
 
-st.title("🎮 Jeux Vidéo Difficiles - RAWG API")
+# Exemple réduit — remplace par ta vraie liste de 500 animés
+anime_list = [
+    "Attack on Titan",
+    "Bleach",
+    "Code Geass",
+    "Death Note",
+    "Evangelion",
+    "Fullmetal Alchemist",
+    "Gintama",
+    "Haikyuu",
+    "Inuyasha",
+    "Jujutsu Kaisen",
+    "K-On!",
+    "Love Live!",
+    "Mob Psycho 100",
+    "Naruto",
+    "One Piece",
+    "Pokemon",
+    "Queen’s Blade",
+    "Re:Zero",
+    "Sword Art Online",
+    "Tokyo Ghoul",
+    "Your Lie in April",
+]
 
-# Récupérer la clé API depuis secrets
-API_KEY = st.secrets["ARD_KEY_API"]
+st.title("🎯 Devine l'anime !")
 
-def chercher_jeux(query):
-    url = f"https://api.rawg.io/api/games"
-    params = {
-        "key": API_KEY,
-        "search": query,
-        "ordering": "-rating",
-        "page_size": 10
-    }
-    response = requests.get(url, params=params)
-    if response.status_code == 200:
-        return response.json().get("results", [])
+# Tirer un anime au hasard et garder en session
+if "anime_courant" not in st.session_state:
+    st.session_state.anime_courant = random.choice(anime_list)
+
+anime_courant = st.session_state.anime_courant
+lettre_indice = anime_courant[0].upper()
+
+st.write(f"L'anime commence par la lettre : **{lettre_indice}**")
+
+# Saisie utilisateur
+reponse = st.text_input("Devine le nom complet de l'anime:")
+
+if st.button("Valider"):
+    if reponse.strip().lower() == anime_courant.lower():
+        st.success("Bravo, c'est la bonne réponse ! 🎉")
+        # Recommencer avec un autre anime
+        st.session_state.anime_courant = random.choice(anime_list)
     else:
-        st.error(f"Erreur API: {response.status_code}")
-        return []
+        st.error("Non, essaie encore !")
 
-query = st.text_input("Recherche un jeu (ex: Dark Souls) :")
-
-if query:
-    jeux = chercher_jeux(query)
-    if jeux:
-        for jeu in jeux:
-            st.subheader(jeu["name"])
-            st.image(jeu["background_image"], width=400)
-            st.write(f"Note moyenne : {jeu['rating']}/5")
-            st.write(f"Sorti le : {jeu['released']}")
-            st.write(jeu["slug"])
-            st.markdown("---")
-    else:
-        st.write("Aucun jeu trouvé.")
-else:
-    st.write("Tape un nom de jeu pour commencer la recherche.")
+if st.button("Changer d'anime"):
+    st.session_state.anime_courant = random.choice(anime_list)
+    st.experimental_rerun()
