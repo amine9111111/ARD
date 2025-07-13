@@ -1,6 +1,12 @@
 import streamlit as st
 
-st.title("🔥 Les jeux vidéo les plus difficiles")
+st.title("🔥 Les jeux vidéo les plus difficiles (accès sécurisé)")
+
+# Récupérer la clé API depuis les secrets Streamlit
+SECRET_API_KEY = st.secrets["ARD_KEY_API"]
+
+# Champ pour entrer la clé
+key_input = st.text_input("Entrez votre clé API pour accéder à l'app :", type="password")
 
 jeux_difficiles = {
     "Dark Souls": {
@@ -33,9 +39,14 @@ jeux_difficiles = {
     }
 }
 
-jeu_choisi = st.selectbox("Choisis un jeu difficile :", list(jeux_difficiles.keys()))
-
-if jeu_choisi:
-    st.subheader(jeu_choisi)
-    st.write(jeux_difficiles[jeu_choisi]["description"])
-    st.write(f"Note de difficulté : {jeux_difficiles[jeu_choisi]['difficulte']} / 10")
+if key_input:
+    if key_input == SECRET_API_KEY:
+        jeu_choisi = st.selectbox("Choisis un jeu difficile :", list(jeux_difficiles.keys()))
+        if jeu_choisi:
+            st.subheader(jeu_choisi)
+            st.write(jeux_difficiles[jeu_choisi]["description"])
+            st.write(f"Note de difficulté : {jeux_difficiles[jeu_choisi]['difficulte']} / 10")
+    else:
+        st.error("Clé API incorrecte, accès refusé.")
+else:
+    st.info("Veuillez entrer votre clé API pour accéder à l'app.")
