@@ -6,13 +6,6 @@ from dotenv import load_dotenv
 # Chargement du fichier .env pour le local
 load_dotenv()
 
-# =====================================================================
-# CHANGER DE MODÈLE ICI 
-# Tu as juste à remplacer le nom entre guillemets par celui de ton choix !
-# Exemples dispos chez Groq : "mixtral-8x7b-32768", "gemma2-9b-it", "llama3-8b-8192"
-# =====================================================================
-MODELE_CHOISI = "mixtral-8x7b-32768" 
-
 # Récupération de la clé API (Cloud + Local)
 if "secrets" in st.__dict__ and "ARD_KEY_API" in st.secrets:
     API_KEY = st.secrets["ARD_KEY_API"]
@@ -22,10 +15,25 @@ else:
 st.set_page_config(page_title="Mon Chatbot AI", page_icon="🤖")
 st.title("🤖 Mon Chatbot Personnalisable")
 
+# =====================================================================
+# BARRE LATÉRALE : Choix du modèle en direct
+# =====================================================================
+st.sidebar.title("Configuration")
+modele_selectionne = st.sidebar.selectbox(
+    "Choisis le modèle de l'IA :",
+    [
+        "llama-3.3-70b-versatile",   # Le tout dernier gros modèle performant de Meta
+        "llama-3.1-8b-instant",      # Ultra rapide pour des réponses immédiates
+        "gemma2-9b-it"               # Le modèle de Google, très bon en français
+    ]
+)
+
+st.sidebar.write(f"Modèle actif : `{modele_selectionne}`")
+
 # Initialisation de l'historique
 if "messages" not in st.session_state:
     st.session_state.messages = [
-        {"role": "assistant", "content": f"Salut ! Je suis ton assistant IA running sur {MODELE_CHOISI}. Comment puis-je t'aider ?"}
+        {"role": "assistant", "content": "Salut ! Je suis ton assistant IA. Pose-moi tes questions !"}
     ]
 
 # Affichage des anciens messages
@@ -52,9 +60,9 @@ if user_input := st.chat_input("Écris ton message ici..."):
                     "Content-Type": "application/json"
                 }
                 
-                # Le payload utilise la variable définie tout en haut
+                # Le payload récupère le modèle choisi dans l'interface
                 payload = {
-                    "model": MODELE_CHOISI,
+                    "model": modele_selectionne,
                     "messages": st.session_state.messages
                 }
                 
