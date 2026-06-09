@@ -15,16 +15,25 @@ else:
 # Configuration de la page
 st.set_page_config(page_title="Stay Light 💡", page_icon="💡", layout="centered")
 
-# Style CSS personnalisé pour rendre l'interface encore plus propre
-st.markdown("""
+# Style CSS personnalisé (Corrigé pour éviter les erreurs d'indentation)
+st.markdown(
+    """
     <style>
-        .block-container { padding-top: 2rem; max-width: 800px; }
-        .stChatMessage { border-radius: 15px; margin-bottom: 10px; }
+    .block-container { 
+        padding-top: 2rem; 
+        max-width: 800px; 
+    }
+    .stChatMessage { 
+        border-radius: 15px; 
+        margin-bottom: 10px; 
+    }
     </style>
-""", unsafe_allowed_html=True)
+    """, 
+    unsafe_allowed_html=True
+)
 
 # =====================================================================
-# SIDEBAR (Barre latérale cachée par défaut pour épuré l'interface)
+# SIDEBAR (Configuration cachée sur le côté)
 # =====================================================================
 st.sidebar.title("⚙️ Configuration")
 modele_selectionne = st.sidebar.selectbox(
@@ -43,7 +52,7 @@ st.sidebar.caption(f"Propulsé par Groq • Modèle actif : `{modele_selectionne
 st.title("💡 Stay Light")
 st.caption("Ton assistant IA authentique, direct et avec un brin d'humour.")
 
-# Personalité de Stay Light (System Prompt)
+# Personnalité de Stay Light (System Prompt)
 SYSTEM_PROMPT = {
     "role": "system",
     "content": (
@@ -59,12 +68,12 @@ SYSTEM_PROMPT = {
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# Message d'accueil réaliste s'il n'y a pas encore de discussion
+# Message d'accueil si la discussion commence à peine
 if len(st.session_state.messages) == 0:
     with st.chat_message("assistant", avatar="💡"):
         st.markdown("Salut ! Moi c'est **Stay Light** 💡. Pose-toi tranquillement, dis-moi ce que tu as sur le cœur ou sur quel projet tu bloques, et on règle ça ensemble !")
     
-    # Boutons d'action rapide (Suggestions)
+    # Suggestions d'action rapide
     st.markdown("### 🚀 Quelques idées pour commencer :")
     col1, col2 = st.columns(2)
     with col1:
@@ -76,13 +85,13 @@ if len(st.session_state.messages) == 0:
             st.session_state.prompt_automatique = "Donne-moi des conseils et une méthode efficace pour réviser mon Brevet"
             st.rerun()
 
-# Affichage des messages existants avec des avatars stylés
+# Affichage des messages de l'historique
 for msg in st.session_state.messages:
     avatar = "👤" if msg["role"] == "user" else "💡"
     with st.chat_message(msg["role"], avatar=avatar):
         st.markdown(msg["content"])
 
-# Gestion du clic sur un bouton de suggestion rapide
+# Gestion des suggestions ou de l'entrée classique
 if "prompt_automatique" in st.session_state:
     user_input = st.session_state.pop("prompt_automatique")
 else:
@@ -90,12 +99,10 @@ else:
 
 # Traitement du message
 if user_input:
-    # 1. Affichage immédiat du message utilisateur
     with st.chat_message("user", avatar="👤"):
         st.markdown(user_input)
     st.session_state.messages.append({"role": "user", "content": user_input})
     
-    # 2. Appel API
     if not API_KEY:
         st.error("Clé API manquante dans tes configurations.")
     else:
