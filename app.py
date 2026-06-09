@@ -12,8 +12,9 @@ if "secrets" in st.__dict__ and "ARD_KEY_API" in st.secrets:
 else:
     API_KEY = os.getenv("ARD_KEY_API")
 
-st.set_page_config(page_title="Mon Chatbot AI", page_icon="🤖")
-st.title("🤖 Mon Chatbot Personnalisable")
+# Configuration de la page avec le nouveau nom "Stay Light 💡"
+st.set_page_config(page_title="Stay Light 💡", page_icon="💡")
+st.title("💡 Stay Light")
 
 # =====================================================================
 # BARRE LATÉRALE : Choix du modèle en direct
@@ -22,18 +23,30 @@ st.sidebar.title("Configuration")
 modele_selectionne = st.sidebar.selectbox(
     "Choisis le modèle de l'IA :",
     [
-        "llama-3.3-70b-versatile",   # Le tout dernier gros modèle performant de Meta
-        "llama-3.1-8b-instant",      # Ultra rapide pour des réponses immédiates
-        "gemma2-9b-it"               # Le modèle de Google, très bon en français
+        "llama-3.3-70b-versatile",   # Gros modèle performant
+        "llama-3.1-8b-instant",      # Ultra rapide
+        "gemma2-9b-it"               # Très bon en français
     ]
 )
 
 st.sidebar.write(f"Modèle actif : `{modele_selectionne}`")
 
-# Initialisation de l'historique
+# Instruction cachée pour donner ma personnalité à ton chatbot (System Prompt)
+SYSTEM_PROMPT = {
+    "role": "system",
+    "content": (
+        "Tu es Stay Light, un collaborateur IA authentique, adaptatif et doté d'une touche d'esprit et d'humour. "
+        "Ton but est d'aller droit au but avec des réponses claires, percutantes et concises. "
+        "Valide les sentiments de l'utilisateur de manière amicale et grounded, et si l'utilisateur fait une erreur, "
+        "corrige-le gentiment mais directement, comme un pote expert, pas comme un prof rigide ou un robot donneur de leçons. "
+        "Adopte un ton moderne, dynamique et adapte ton niveau d'énergie à celui de ton interlocuteur."
+    )
+}
+
+# Initialisation de l'historique avec le message d'accueil personnalisé
 if "messages" not in st.session_state:
     st.session_state.messages = [
-        {"role": "assistant", "content": "Salut ! Je suis ton assistant IA. Pose-moi tes questions !"}
+        {"role": "assistant", "content": "Salut ! Moi c'est Stay Light 💡. Pose-toi tranquillement, dis-moi ce que tu as sur le cœur ou sur quel projet tu bloques, et on règle ça ensemble !"}
     ]
 
 # Affichage des anciens messages
@@ -42,7 +55,7 @@ for msg in st.session_state.messages:
         st.markdown(msg["content"])
 
 # Entrée utilisateur
-if user_input := st.chat_input("Écris ton message ici..."):
+if user_input := st.chat_input("Dis-moi tout..."):
     
     with st.chat_message("user"):
         st.markdown(user_input)
@@ -60,10 +73,11 @@ if user_input := st.chat_input("Écris ton message ici..."):
                     "Content-Type": "application/json"
                 }
                 
-                # Le payload récupère le modèle choisi dans l'interface
+                # On injecte le SYSTEM_PROMPT au tout début pour injecter la personnalité,
+                # suivi de tout le reste de la discussion de session
                 payload = {
                     "model": modele_selectionne,
-                    "messages": st.session_state.messages
+                    "messages": [SYSTEM_PROMPT] + st.session_state.messages
                 }
                 
                 try:
