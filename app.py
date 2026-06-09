@@ -15,7 +15,7 @@ else:
 # Configuration de la page
 st.set_page_config(page_title="Stay Light 💡", page_icon="💡", layout="centered")
 
-# Injection CSS via st.html en une seule ligne (Zéro problème de syntaxe ou de métriques Python)
+# Injection CSS via st.html en une seule ligne pour éviter les bugs sur Streamlit Cloud
 st.html("<style>.block-container { padding-top: 2rem; max-width: 800px; } .stChatMessage { border-radius: 15px; margin-bottom: 10px; }</style>")
 
 # =====================================================================
@@ -59,12 +59,12 @@ if len(st.session_state.messages) == 0:
     with st.chat_message("assistant", avatar="💡"):
         st.markdown("Salut ! Moi c'est **Stay Light** 💡. Pose-toi tranquillement, dis-moi ce que tu as sur le cœur ou sur quel projet tu bloques, et on règle ça ensemble !")
     
-    # Suggestions d'action rapide
+    # Suggestions d'action rapide mises à jour
     st.markdown("### 🚀 Quelques idées pour commencer :")
     col1, col2 = st.columns(2)
     with col1:
-        if st.button("Code-moi un mini-jeu en Python 🎮"):
-            st.session_state.prompt_automatique = "Code-moi un mini-jeu en Python simple et fun"
+        if st.button("Aide-moi à réviser des choses basiques 🧠"):
+            st.session_state.prompt_automatique = "Aide-moi à réviser des notions de base et des sujets importants (comme le français, les maths ou l'histoire)."
             st.rerun()
     with col2:
         if st.button("Aide-moi à réviser mon Brevet 📝"):
