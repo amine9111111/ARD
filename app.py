@@ -15,22 +15,8 @@ else:
 # Configuration de la page
 st.set_page_config(page_title="Stay Light 💡", page_icon="💡", layout="centered")
 
-# Style CSS personnalisé (Corrigé pour éviter les erreurs d'indentation)
-st.markdown(
-    """
-    <style>
-    .block-container { 
-        padding-top: 2rem; 
-        max-width: 800px; 
-    }
-    .stChatMessage { 
-        border-radius: 15px; 
-        margin-bottom: 10px; 
-    }
-    </style>
-    """, 
-    unsafe_allowed_html=True
-)
+# Injection CSS via st.html en une seule ligne (Zéro problème de syntaxe ou de métriques Python)
+st.html("<style>.block-container { padding-top: 2rem; max-width: 800px; } .stChatMessage { border-radius: 15px; margin-bottom: 10px; }</style>")
 
 # =====================================================================
 # SIDEBAR (Configuration cachée sur le côté)
